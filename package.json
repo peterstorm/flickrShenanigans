@@ -1,0 +1,36 @@
+{
+  "name": "testapp",
+  "version": "1.0.0",
+  "description": "testApp",
+  "main": "index.js",
+  "scripts": {
+    "server": "live-server public/",
+    "build": "webpack --mode development --watch",
+    "dev-server": "webpack-dev-server --mode development"
+  },
+  "author": "Peter Storm",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.3",
+    "babel-preset-env": "^1.6.1",
+    "data.either": "^1.5.1",
+    "data.task": "^3.1.1",
+    "fluture": "^8.0.2",
+    "fluture-sanctuary-types": "^1.5.0",
+    "folktale": "^2.1.0",
+    "jquery": "^3.3.1",
+    "json-loader": "^0.5.7",
+    "live-server": "^1.2.0",
+    "ramda": "^0.25.0",
+    "request": "^2.83.0",
+    "sanctuary": "^0.14.1",
+    "sanctuary-def": "^0.14.0",
+    "webpack": "^4.0.1",
+    "webpack-dev-server": "^3.1.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^2.0.10"
+  }
+}
