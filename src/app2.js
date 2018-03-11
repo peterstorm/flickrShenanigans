@@ -2,18 +2,47 @@ const { create, env } = require('sanctuary')
 const { env: flutureEnv } = require('fluture-sanctuary-types')
 const Future = require('fluture')
 const S = create({ checkTypes: true, env: env.concat(flutureEnv)})
+const request = require('request')
+const { compose, map } = require('ramda')
+const url = 'https://api.flickr.com/services/feeds/photos_public.gne/?tags=aww&format=json&nojsoncallback=1'
 
-const { maybeToEither, at, is, get, compose, add } = S;
+const eitherToFuture = S.either(Future.reject, Future.of)
 
-const addresses = [
-  { street: 'Sandby', number: 3 },
-  { street: 'Daldslandgade' }
-]
+const safeParse = S.encaseEither(S.I, JSON.parse)
 
-const safeGetAddress = index => compose(maybeToEither('No address'), at(index))
+const getJSON = url =>
+  Future((rej, res) =>
+    void request(url, (error, response, body) =>
+      error ? rej(error) : res(body)
+))
 
-const safeGetStreet = compose(maybeToEither('No street'), get(is(String), 'street'))
+const parsedJSON = url =>
+  getJSON(url)
+    .map(safeParse)
+    .chain(eitherToFuture)
 
-const result = safeGetAddress(0)(addresses).map(add(1))
+const extractPhotos = S.pipe([S.prop('items'), S.map(S.prop('media')), S.map(S.prop('m'))])
 
-console.log(result)
+const getPhotos = S.pipe([parsedJSON, S.map(extractPhotos)])
+
+// img :: Url -> IMG tag
+const img = x => {
+  let el = document.createElement('img');
+  el.setAttribute('src', x);
+  return el;
+}
+
+// makeImgs :: [Photos] -> [imgs]
+const makeImgs = compose(map(map(img)), getPhotos)
+
+const getElement = x => document.getElementById(x)
+
+// setHtml :: [Photos] -> _
+const setHtml = x => getElement('js-main').append(x)
+
+// [Photos] -> DOM
+makeImgs(url).fork(console.error, map(setHtml) )
+
+
+
+
